@@ -1,2 +1,2 @@
-# first-steps-in-ML
-here is a description of my progress into the vastness of machine learning
+# First steps in ML
+This repository like daily planner of my diving into ML world. Here experiments with the theoretical knowledge from [this](https://academy.yandex.ru/handbook/ml) course
