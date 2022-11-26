@@ -58,10 +58,12 @@ def digit2array(digit):
 def array2digit(array):
     return array.argmax()
 
-def show_array_as_image(array):
+def show_array_as_image(array, digit = None):
     plt.imshow(array)
+    if not None:
+        print(array2digit(digit))
 
-def from_dataset_jpgs2array(training_data = True, N = None):
+def from_dataset_jpgs2dict(N = None, training_data = True):
     folder_name = 'training' if training_data else 'testing'
     folders = [
         (hdr_directory + '/' + 'Dataset' + '/' + folder_name + '/' + str(digit), digit)
@@ -78,3 +80,16 @@ def from_dataset_jpgs2array(training_data = True, N = None):
     for i in range(10):
         digit_arrays[i] = [mpimg.imread(path) for path in digit_file_names[i][:N]]
     return digit_arrays
+
+def dict2arrays(mydict):
+    X_dataset = []
+    Y_target = []
+    for key in mydict.keys():
+        for array in mydict[key]:
+            X_dataset.append(array.reshape(-1))
+            Y_target.append(digit2array(key))
+    return np.array(X_dataset), np.array(Y_target)
+
+def jpg2data(N = None, training_data = True):
+    mydict = from_dataset_jpgs2dict(N, training_data)
+    return dict2arrays(mydict)
