@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
     
 class MLP:
     def __init__(self, input_size = 28*28, hidden_layers_sizes = [16*10, 8*10, 2*10], output_size = 10):
@@ -59,12 +60,16 @@ class MLP:
             gradient_of_loss_function = self.weights[i].T @ casteel
             
     def fit(self, X_input, Y_target, number_of_epochs = 500, learning_rate = 2, show = False):
+        error = []
         for k in range(number_of_epochs):
             Y_predict = self.forward_propagat(X_input)
-            if show or k == 0 or k == number_of_epochs - 1:
-                print("error in epoch_{} is: ".format(k), ((Y_predict - Y_target)*(Y_predict - Y_target)).sum()/(Y_predict.shape[1]))
+            if show:
+                error.append(((Y_predict - Y_target)*(Y_predict - Y_target)).sum()/(Y_predict.shape[1]))
             self.backward_propagat(Y_target)
             for i, j in enumerate(reversed(range(len(self.weights)))):
                 self.weights[i] -= learning_rate * self.gradients_of_weights[j]
                 self.biases[i] -= learning_rate * self.gradients_of_biases[j]
+        if show:
+            plt.plot(error)
+            plt.show()
 
