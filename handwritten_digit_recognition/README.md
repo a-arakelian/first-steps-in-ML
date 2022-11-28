@@ -29,7 +29,9 @@ Full MLP code can be viewed in the [`MLP_manual/mlp.py`](https://github.com/a-ar
 For a full understanding of the implementation of the method of error back propagation, it is necessary to understand well and get used to the notation of matrix differentiation.
 
 <p align="center">
-    <br />
     <a href="https://academy.yandex.ru/handbook/ml/article/metod-obratnogo-rasprostraneniya-oshibki"><img src="https://yastatic.net/s3/ml-handbook/admin/17_4_b1b2356957.gif"></a>
-    <br />
 </p>
+
+### Outcome
+
+Pretty weird shit is going on. When performing gradient descent, the values of the `loss function` decrease, but the neural network from the word does *not* cope with the recognition of handwritten numbers at all, although it has pretty well learned multiplication. All results can be viewed in [`mlp.ipynd`](https://github.com/a-arakelian/first-steps-in-ML/blob/main/handwritten_digit_recognition/mlp.ipynb).
