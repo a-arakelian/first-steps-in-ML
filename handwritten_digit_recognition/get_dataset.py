@@ -60,7 +60,7 @@ def array2digit(array):
 
 def show_array_as_image(array, digit = None):
     plt.imshow(array)
-    if not None:
+    if digit != None:
         print(array2digit(digit))
 
 def from_dataset_jpgs2dict(N = None, training_data = True):
