@@ -36,7 +36,7 @@ For a full understanding of the implementation of the method of error back propa
 #### Outcome
 
 Pretty weird shit is going on. When performing gradient descent, the values of the `loss function` decrease, but the neural network from the word does *not* cope with the recognition of handwritten numbers at all, although it has pretty well learned multiplication. All results can be viewed in [`mlp.ipynd`](https://github.com/a-arakelian/first-steps-in-ML/blob/main/handwritten_digit_recognition/mlp.ipynb).
->[Later](####Outcome-2) it became clear that the problem was in the wrong scaling of the data.
+> [Later]([https://github.com/a-arakelian/first-steps-in-ML/edit/main/handwritten_digit_recognition/README.md#outcome-2) it became clear that the problem was in the wrong scaling of the data.
 
 ### second variant (MLP2)
 >Given the oddities and slowness of the previous model, I decided to make another option. Changed the construction architecture by dividing one large class into classes `Layer` and `MLP2` and also added the ability to monitor the loss function on the learning sample and on the test
