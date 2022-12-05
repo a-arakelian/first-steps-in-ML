@@ -6,6 +6,7 @@ To work properly, you need to download the [following 7z file](https://www.dropb
 -  [MLP manually](#mlp-manually)
 
 ## MLP manually
+### first variant (MLP)
 When implementing the MLP manually, as one might expect, the most tricky part was the backward propagation of the error. As the most complex and important part of the code, I will highlight it here.
 ```py
     def backward_propagat(self, target):
@@ -32,6 +33,28 @@ For a full understanding of the implementation of the method of error back propa
     <a href="https://academy.yandex.ru/handbook/ml/article/metod-obratnogo-rasprostraneniya-oshibki"><img src="https://yastatic.net/s3/ml-handbook/admin/17_4_b1b2356957.gif"></a>
 </p>
 
-### Outcome
+#### Outcome
 
 Pretty weird shit is going on. When performing gradient descent, the values of the `loss function` decrease, but the neural network from the word does *not* cope with the recognition of handwritten numbers at all, although it has pretty well learned multiplication. All results can be viewed in [`mlp.ipynd`](https://github.com/a-arakelian/first-steps-in-ML/blob/main/handwritten_digit_recognition/mlp.ipynb).
+>[Later](####Outcome-2) it became clear that the problem was in the wrong scaling of the data.
+
+### second variant (MLP2)
+>Given the oddities and slowness of the previous model, I decided to make another option. Changed the construction architecture by dividing one large class into classes `Layer` and `MLP2` and also added the ability to monitor the loss function on the learning sample and on the test
+
+It seems that on the second attempt, the backward_pass turned out to be more compact. As usual, I'm posting it here.
+```py
+    def backward_pass(self, gradient):
+        eye = np.eye(self.output_size, self.output_size+1, 1) if self.children else np.eye(self.output_size, self.output_size)
+        activation_gradient = self.gradient_of_activat(self.liner_transform)
+        liner_transform_gradient = self.input_with_bias
+        if self.tensor:
+            np.matmul(np.expand_dims((gradient @ eye.T), 1), activation_gradient).squeeze()
+        else:
+            self.gradient = liner_transform_gradient.T @ ((gradient @ eye.T) * activation_gradient)
+        if self.parent != None:
+            self.parent.backward_pass((gradient @ eye.T * activation_gradient) @ self.weights.T)
+```
+#### Outcome 2
+After many unsuccessful attempts, I finally realized that the problem was not in the `MLP` at all, but only the output data was scaled unsuccessfully (from 0 to 1). By scaling the data on the interval 10 times smaller, that is, from 0 to 0.1, everything worked!
+#### P.S.
+In these attempts, I tried the `softmax` activation function and as a loss function `negative log likelihood`. But in order to avoid tensor multiplications, I took the `identical` mapping as an activation function, and loss took the `composition of softmax and negative log likelihood`. In this form, everything also worked, **which I can’t say about other implementation options, since I haven’t tested them**
