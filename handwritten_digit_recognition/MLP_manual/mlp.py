@@ -74,17 +74,31 @@ class MLP:
             plt.show()
             
 ### another try ###
+def softmax_differential(x: np.array):
+    differential = []
+    (n, m) = x.shape
+    for i in range(n):
+        v = x[i,:].reshape((1, m))
+        _differential = np.diag(v.reshape(-1)) - (v.T @ v)
+        differential.append(_differential)
+    return(np.array(differential))
 
 ACTIVATION_FUNCTIONS = {
-    'tanh': [lambda x: (np.exp(2*x) - 1)/(np.exp(2*x) + 1), lambda x: 1 - (np.exp(2*x) - 1)/(np.exp(2*x) + 1)**2],
-    'sigmoid': [lambda x: 1/(np.exp(-x) + 1), lambda x: (1/(np.exp(-x) + 1))*(1/(np.exp(x) + 1))],
+    'id': [lambda x: x, lambda x: 1, False],
+    'tanh': [lambda x: (np.exp(2*x) - 1)/(np.exp(2*x) + 1), lambda x: 1 - (np.exp(2*x) - 1)/(np.exp(2*x) + 1)**2, False],
+    'sigmoid': [lambda x: 1/(np.exp(-x) + 1), lambda x: (1/(np.exp(-x) + 1))*(1/(np.exp(x) + 1)), False],
+    'softmax': [lambda x: np.exp(x)/(np.exp(x).sum(axis=1).reshape(x.shape[0], 1)), softmax_differential, True]
 }
 LOSS_FUNCTIONS = {
-    'mse': [lambda x, y: ((x - y)*(x - y)).sum()/(y.shape[0]), lambda x, y: (1/y.shape[0])*2*(x - y)]
+    'mse': [lambda x, y: ((x - y)*(x - y)).sum()/(y.shape[0]), lambda x, y: (1/y.shape[0])*2*(x - y)],
+    'negative_log_likelihood': [lambda x, y: -(y * np.log(x)).sum(), lambda x, y: (y * np.log(x)).sum(),],
+    'softmax_negative_log_likelihood': [lambda x, y: -(1/y.shape[0])*(y * np.log(ACTIVATION_FUNCTIONS['softmax'][0](x))).sum(), lambda x, y: (1/y.shape[0])*(ACTIVATION_FUNCTIONS['softmax'][0](x) - y)]
 }
+
 
 class Layer:
     def __init__(self, input_size = 5, output_size = 2, activation_function_name = 'tanh', children = None, parent = None):
+        self.tensor = ACTIVATION_FUNCTIONS[activation_function_name][2]
         self.input_size = input_size
         self.output_size = output_size
         self.weights = np.random.rand(input_size + 1, output_size) # +1 is bias
@@ -112,7 +126,11 @@ class Layer:
         #print('gradient size does not match to output size') if gradient.shape[1] != self.output_size else None
         activation_gradient = self.gradient_of_activat(self.liner_transform)
         liner_transform_gradient = self.input_with_bias
-        self.gradient = liner_transform_gradient.T @ ((gradient @ eye.T) * activation_gradient)
+        if self.tensor:
+            # activation_gradient has shape (batchsize, n, n)
+            np.matmul(np.expand_dims((gradient @ eye.T), 1), activation_gradient).squeeze()
+        else:
+            self.gradient = liner_transform_gradient.T @ ((gradient @ eye.T) * activation_gradient)
         if self.parent != None:
             self.parent.backward_pass((gradient @ eye.T * activation_gradient) @ self.weights.T)
             
